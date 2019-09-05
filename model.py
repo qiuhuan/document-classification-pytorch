@@ -5,6 +5,8 @@ import torch.nn.functional as F
 import pdb
 def resize2batchSentences(feature_tensor,sen_len_seq):
     '''
+    the batch size of padding is [sum(sen_len_seq), dim]
+    and transform it to [batch, max_sen_len, dim], padding 0 if it is less than max_sen_len
     pad 后的batch size 是 【sum(sen_len_seq), dim】,即 feature_tensor.size
     将其转为[batch, max_sen_len, dim], 不足max_sen_len的，补0
     '''
@@ -26,7 +28,7 @@ def resize2batchSentences(feature_tensor,sen_len_seq):
 
 class EncodeWithAttention(nn.Module):
     '''
-    参考论文Hierarchical Attention Networks for Document Classification
+    paper is Hierarchical Attention Networks for Document Classification
     '''
     def __init__(self,input_size,hidden_size,num_layers=1,bidirectional=True,attention_dim=None):
         super(EncodeWithAttention,self).__init__()
@@ -70,7 +72,7 @@ class EncodeWithAttention(nn.Module):
         rnn_output = rnn_output[0][idx_unsort,:,:]
 
         #attention
-        u = torch.tanh(self.project(rnn_output)) #论文中公式5 [B,T,K]->[B,T,attention_dim]
+        u = torch.tanh(self.project(rnn_output)) #formula 5 [B,T,K]->[B,T,attention_dim]
         #[B,T,attention_dim]*[attention_dim,1]->[B,T,1] ->[B,T]
         att_weight = torch.cat([(u[i,:,:].mm(self.context)).unsqueeze(0) for i in range(u.size(0))],0)
         att_weight = att_weight.squeeze(2)
@@ -124,9 +126,9 @@ class HAN(nn.Module):
 
     def forward(self,input,sentences_len_seq, tokens_len_seq):
         '''
-        :param input: [sum(sentences_len_seq), max(tokens_len_seq)],用[B*Ts_sum,Tw]表示
-        :param sentences_len_seq: 1维Tensor
-        :param tokens_len_seq: 1维Tensor
+        :param input: [sum(sentences_len_seq), max(tokens_len_seq)], expressed by [B*Ts_sum,Tw]
+        :param sentences_len_seq: 1 dim Tensor
+        :param tokens_len_seq: 1 dim Tensor
         :return:
         '''
         # print(input)
