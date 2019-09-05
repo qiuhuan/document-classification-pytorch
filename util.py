@@ -25,12 +25,12 @@ label2idx,idx2label = getEncodeDecode(labels_file,istoken = False)
 
 def getExample(content,label=None, tokenF = lambda x:x.split()):
     '''
-    :param content:多个句子组成的文档，为一个字符串
-    :param label: 文档的类别信息
-    :param tokenF: 对单个句子分词的函数
+    :param content: is a documents, consisted by multiple sentences, which is a string
+    :param label: the class of document
+    :param tokenF: the function for tokenizing sentences
     :return:
-        sen_seq_token是一个list，其元素也是list，[[doc1_w1,doc1_w2,doc1_w3,...], [doc2_w1,doc2_w2,doc2_w3,...], ...]
-        sen_seq_len是该文档包含的句子条数
+        sen_seq_token is a list，the format is [[doc1_w1,doc1_w2,doc1_w3,...], [doc2_w1,doc2_w2,doc2_w3,...], ...]
+        sen_seq_len the num of sentences of the document
     '''
     sentences = list(SentenceSplitter.split(content))
     sen_seq_len = []
@@ -84,7 +84,7 @@ def pad(examples):
 
 def genBatch(examples,batch_size=16,istrain=True):
     # pdb.set_trace()
-    #执行一遍，跑一个epoch
+    #run an epoch
     if istrain:
         random.shuffle(examples)
     for step in range(0,len(examples),batch_size):
